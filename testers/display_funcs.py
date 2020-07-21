@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 from .helpers import imshow
+from cpp_algorithms import splice_paths
 
 def printer(metrics):
     for m in metrics:

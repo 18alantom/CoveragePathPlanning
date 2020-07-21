@@ -6,10 +6,13 @@ from tqdm.autonotebook import tqdm
 from .metrics import coverage_metrics, fuel_metrics
 from .display_funcs import path_show, path_animate, printer
 from .helpers import get_random_coords
+
+from cpp_algorithms import dist_fill, get_fuel_paths
+
 """
 Test function to run tests on multiple image maps all at once.
 """
-def cpp_tests_single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True):
+def single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True):
     """
     Returns a DataFrame of test Results. 
     Tests are run with randomly generated points for start, end and fuel.
@@ -67,7 +70,7 @@ def cpp_tests_single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_path
 """
 Test Function to run tests on a single test map and show the results
 """
-def cpp_tests_single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
+def single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
                                   start_point=None, end_point=None, fuel_points=None,\
                                   fuel_capacity=None, fp_count=None, animate=False,\
                                   interval=10, repeat=False,printm=True, show_paths=True,\
