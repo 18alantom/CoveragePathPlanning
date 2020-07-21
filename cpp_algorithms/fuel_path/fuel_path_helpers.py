@@ -104,8 +104,7 @@ def get_refuel_idx(dist_map, path, fuel_cap):
         try:
             idx = freq[freq >= 0].argmin()
         except ValueError:
-            print("path can't be completed, insufficient fuel capacity")
-            return
+            raise ValueError("path can't be completed, insufficient fuel capacity")
 
         cu += idx
 
