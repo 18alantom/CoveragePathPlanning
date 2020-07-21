@@ -1,4 +1,7 @@
 
+import numpy as np
+from copy import deepcopy
+
 from .dist_matrix import dist_fill
 from .fuel_path_helpers import get_refuel_idx, path_to_fuel
 
