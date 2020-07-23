@@ -15,7 +15,7 @@ def is_valid(coord, shape):
     
 def get_udlr(dist_map, v_map, center, to_vis):
     """
-    Returns valid non diagonal steps.
+    Sets valid non diagonal steps.
     """
     x,y = center
     udlr = [(x,y+1),(x,y-1),(x-1,y),(x+1,y)]

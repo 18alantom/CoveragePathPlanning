@@ -6,6 +6,27 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from PIL import Image
 
+RES = [(32, 32),(50, 50),(50, 144),(144, 255),(256,256)]
+
+def generate_no_obs_area_map(resolutions=RES):
+    """
+    resolutions : list of tuples [(rows, cols)]
+    """
+    area_maps = []
+    for res in resolutions:
+        area_maps.append(np.zeros(res))
+    return area_maps
+
+def generate_point_obstacles(area_map, p=0.5):
+    """
+    Adds point obstacles to the area_map with the given
+    probability `p`, if `p==1` then the entire map will
+    be covered.
+    """
+    area_map = area_map.copy()
+    area_map[np.random.rand(*area_map.shape)<p] =  -1
+    return area_map
+
 def get_area_map(path, area=0,obs=-1):
     """
     path : path to area map png, png should have only 
@@ -21,7 +42,7 @@ def get_area_map(path, area=0,obs=-1):
     am[~ma]  = obs
     return am
 
-def imshow_scatter(path, color, alpha, s):
+def imshow_scatter(path, color="orange", alpha=1, s=20):
     """
     Prints the points in the path
     """
