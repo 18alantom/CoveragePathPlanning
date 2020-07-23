@@ -3,6 +3,30 @@ Some helper functions that are often used.
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
+from PIL import Image
+
+def get_area_map(path, area=0,obs=-1):
+    """
+    path : path to area map png, png should have only 
+    0 255 as values.
+    returns area_map with cell values
+    obstacle : OBS
+    non obstacle : NOB
+    """
+    am = np.array(Image.open(path))
+    ma = np.array(am).mean(axis=2) == 255
+    am = np.int8(np.zeros(ma.shape))
+    am[ma] = area
+    am[~ma]  = obs
+    return am
+
+def imshow_scatter(path, color, alpha, s):
+    """
+    Prints the points in the path
+    """
+    x,y = np.array(path).T
+    plt.scatter(y,x, color=color, alpha=alpha, s=s)
 
 def imshow(area_map,figsize=(5,5),cmap="viridis"):
     """
@@ -61,9 +85,27 @@ def is_valid(coord, area_map, obstacle = -1):
     Check is a coord (x,y) is bounded and not
     on an obstacle.
     """
+    coord = tuple(coord)
     is_b = is_bounded(coord, area_map.shape)
 
-    is_on_obs  = area_map[coord] == obstacle
-    if is_b and not is_on_obs:
-        return True
+    if is_b:
+        is_on_obs  = area_map[coord] == obstacle
+        if not is_on_obs:
+            return True
     return False
+
+def get_all_area_maps(folder_path):
+    """
+    Returns size sorted list of area maps.
+    
+    folder_path : path to the folder contiaining the maps (.png)
+    """
+    ams = []
+    for path in Path(folder_path).iterdir():
+        try:
+            ams.append(get_area_map(path))
+        except:
+            continue
+            
+    am_idx = np.array([am.size for am in ams]).argsort()
+    return list(np.array(ams)[am_idx])

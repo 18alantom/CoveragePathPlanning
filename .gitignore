@@ -1,6 +1,7 @@
 # Test folder and settings
 sandbox/
 .vscode/
+BlindScan.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
