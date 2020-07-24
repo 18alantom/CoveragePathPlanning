@@ -3,18 +3,18 @@ from .wavefront_helpers import get_replacement_paths_l1
 from cpp_algorithms.testers import get_random_coords
 from cpp_algorithms.coverage_path.pathing_helpers import splice_paths, has_isolated_areas
 
-def wavefront(start_point, area_map, center_point=None, isolated_area_check=True,
+def wavefront(area_map,  start_point, center_point=None, isolated_area_check=True,
               use_replacements_paths=True, splice_backtrack_paths=True):
     """
     Runs the wavefront algorithm and returns a generated path.
     
     PARAMETERS
     ---
-    start_point : Drone deployment point on the `area_map`, tuple (x,y)
-    
     area_map : Area map to be covered, 2-dim numpy array. 
         coverage region =  0
         obstacle region = -1
+
+    start_point : Drone deployment point on the `area_map`, tuple (x,y)
         
     isolated_area_check : if True will check region for isolated areas, 
         algorithm will return None.

@@ -23,7 +23,7 @@ def coverage_metrics(area_map, path):
     vis_points = vis_map.sum() - obs_points
     
     coverage = vis_points/total_points_nobs
-    redundancy = 1-vis_points/p_len
+    redundancy = p_len/vis_points - 1
     
     return {
         "points_to_visit":total_points_nobs,
