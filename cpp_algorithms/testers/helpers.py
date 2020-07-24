@@ -8,6 +8,25 @@ from PIL import Image
 
 RES = [(32, 32),(50, 50),(50, 144),(144, 255),(256,256)]
 
+def adjacency_test(path, exactly_one=True):
+    """
+    Checks all points in a path for L1 adjacency.
+    """
+    prev_point = path[0]
+    for i,point in enumerate(path[1:]):
+        x,y = prev_point
+        x_,y_ = point 
+        
+        dist = np.abs(x - x_) + np.abs(y - y_)
+        prev_point = point
+        if exactly_one and dist == 1:
+            continue
+        elif dist <= 1:
+            continue
+        else:
+            return i - 1
+    return True
+
 def generate_no_obs_area_map(resolutions=RES):
     """
     resolutions : list of tuples [(rows, cols)]

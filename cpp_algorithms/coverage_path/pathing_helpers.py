@@ -6,6 +6,26 @@ get_adj = lambda x,y :[
     (x+1,y),(x-1,y),(x,y+1),(x,y-1)
 ]
 
+def splice_paths(coverage_path, splice_indices, splice_segments):
+    """
+    Splices in `splice_segments` at the given `splice_indices` for
+    the given `coverage_path`
+    """
+    assert len(splice_indices) == len(splice_segments), "length discrepancy"
+    full_path_segments = []
+    last_idx = 0
+    for i,idx in enumerate(splice_indices):
+        seg = np.array(coverage_path[last_idx:idx])
+        if len(seg) > 0:
+            full_path_segments.append(seg)
+        seg = np.array(splice_segments[i])
+        if len(seg) > 0:
+            full_path_segments.append(seg)
+        last_idx = idx + 1
+        
+    full_path_segments.append(np.array(coverage_path[last_idx:]))
+    return np.concatenate(full_path_segments)
+
 def has_isolated_areas(area_map, obstacle=-1):
     """
     Flood fills the area to check if there are 
