@@ -33,17 +33,22 @@ def single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True):
     for i,area_map in tqdm(enumerate(area_maps), total=len(area_maps)):
         t_metrics = {}
         f_metrics = {}
+        c_metrics = {}
         start_point = get_random_coords(area_map,1)[0]
         end_point =   get_random_coords(area_map,1)[0]
         
         # Coverage Path calculation.
         t = time.time()
-        if no_end:
-            coverage_path = cpp_algo(area_map, start_point)
-        else:
-            coverage_path = cpp_algo(area_map, start_point, end_point)
-        t_metrics["cp_compute_time"] = time.time() - t
-        c_metrics = coverage_metrics(area_map, coverage_path)
+        try: 
+            if no_end:
+                coverage_path = cpp_algo(area_map, start_point)
+            else:
+                coverage_path = cpp_algo(area_map, start_point, end_point)
+            t_metrics["cp_compute_time"] = time.time() - t
+            c_metrics = coverage_metrics(area_map, coverage_path)
+            t_metrics["success"] = True
+        except:
+            t_metrics["success"] = False
         
         # Fuel Path calculation.
         if fuel_paths == True:
@@ -111,6 +116,7 @@ def single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
     
     t_metrics = {}
     f_metrics = {}
+    c_metrics = {}
     
     fuel_paths_ = None
     dist_map = None
@@ -121,12 +127,16 @@ def single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
     
     # Coverage Path calculation.
     t = time.time()
-    if no_end:
-        coverage_path = cpp_algo(area_map, start_point)
-    else:
-        coverage_path = cpp_algo(area_map, start_point, end_point)
-    t_metrics["cp_compute_time"] = time.time() - t
-    c_metrics = coverage_metrics(area_map, coverage_path)
+    try: 
+        if no_end:
+            coverage_path = cpp_algo(area_map, start_point)
+        else:
+            coverage_path = cpp_algo(area_map, start_point, end_point)
+        t_metrics["cp_compute_time"] = time.time() - t
+        c_metrics = coverage_metrics(area_map, coverage_path)
+        t_metrics["success"] = True
+    except:
+        t_metrics["success"] = False
     
     if fuel_paths == True:
         if fuel_points is None:

@@ -13,4 +13,6 @@ from .testers import generate_no_obs_area_map, generate_point_obstacles
 from .testers import single_robot_multiple
 from .testers import single_robot_single
 
+# Coverage path generation algorithms.
 from .coverage_path.wavefront import wavefront
+from .coverage_path.stc import stc

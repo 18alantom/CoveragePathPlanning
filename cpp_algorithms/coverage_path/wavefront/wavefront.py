@@ -44,7 +44,7 @@ def wavefront(area_map,  start_point, center_point=None, isolated_area_check=Tru
         center_point = get_random_coords(area_map, 1)[0]
     
     if isolated_area_check and has_isolated_areas(area_map):
-        return None
+        raise ValueError("map has isolated areas")
     
     coverage_path, backtrack_paths, backtrack_starts = wavefront_caller(area_map, start_point, center_point)
     
