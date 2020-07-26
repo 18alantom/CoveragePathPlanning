@@ -6,6 +6,11 @@ get_adj = lambda x,y :[
     (x+1,y),(x-1,y),(x,y+1),(x,y-1)
 ]
 
+get_adj_8 = lambda x,y :[
+    (x+1,y),(x-1,y),(x,y+1),(x,y-1),
+    (x+1,y+1),(x-1,y-1),(x-1,y+1),(x+1,y-1)
+]
+
 def splice_paths(coverage_path, splice_indices, splice_segments):
     """
     Splices in `splice_segments` at the given `splice_indices` for

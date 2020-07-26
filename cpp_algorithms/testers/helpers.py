@@ -129,7 +129,12 @@ def is_valid(coord, area_map, obstacle = -1):
     is_b = is_bounded(coord, area_map.shape)
 
     if is_b:
-        is_on_obs  = area_map[coord] == obstacle
+        is_on_obs = False
+        if isinstance(obstacle, list):
+            for obs in obstacle:
+                is_on_obs |= area_map[coord] == obs
+        else:
+            is_on_obs  = area_map[coord] == obstacle
         if not is_on_obs:
             return True
     return False
