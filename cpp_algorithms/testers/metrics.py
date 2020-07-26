@@ -35,12 +35,15 @@ def coverage_metrics(area_map, path):
         "area_shape":area_map.shape
     }
 
-def fuel_metrics(fuel_paths, fuel_capacity):
+def fuel_metrics(fuel_paths, fuel_capacity, full_path, area_map):
     """
     TODO : Need to complete this function, add more metrics.
     """
+    full_path_metrics = coverage_metrics(area_map, full_path)
     fp_len = np.sum([len(fp) for fp in fuel_paths])*2
     return {
+        "refuels" : len(fuel_paths),
         "fuel_path_len": fp_len,
-        "fuel_capacity": fuel_capacity
+        "fuel_capacity": fuel_capacity,
+        "total_redundancy": full_path_metrics["redundancy"],
     }

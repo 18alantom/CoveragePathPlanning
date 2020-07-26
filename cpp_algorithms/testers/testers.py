@@ -1,18 +1,22 @@
 import time
 import numpy as np
 import pandas as pd
-from tqdm.autonotebook import tqdm
+from tqdm.auto import tqdm
 
 from .metrics import coverage_metrics, fuel_metrics
 from .display_funcs import path_show, path_animate, printer
 from .helpers import get_random_coords
 
 from cpp_algorithms import dist_fill, get_fuel_paths
+from cpp_algorithms import splice_paths
+
+# Fuel capacity distance multiplier
+FC_DIST_MULTIPLIER = 5
 
 """
 Test function to run tests on multiple image maps all at once.
 """
-def single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True):
+def single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True, start_point=None, center_point=None):
     """
     Returns a DataFrame of test Results. 
     Tests are run with randomly generated points for start, end and fuel.
@@ -26,42 +30,49 @@ def single_robot_multiple(cpp_algo, area_maps, no_end=False, fuel_paths=True):
     area_maps : list of area_map on which the path has to be calculated.
     no_end : if the `cpp_algo` requires an end point then should be true.
     fuel_paths : whether to calculate the fuel paths.
+    start_point : to be used only when the same map is used for randomness
+        dependence checks.
+    center_point : for testing wavefront
     """
-    FC_MAX_DIST_MULTIPLIER = 5
     
     results = []
     for i,area_map in tqdm(enumerate(area_maps), total=len(area_maps)):
         t_metrics = {}
         f_metrics = {}
         c_metrics = {}
-        start_point = get_random_coords(area_map,1)[0]
+        if start_point is None:
+            start_point = get_random_coords(area_map,1)[0]
         end_point =   get_random_coords(area_map,1)[0]
         
         # Coverage Path calculation.
         t = time.time()
         try: 
+            if no_end and center_point is not None:
+                coverage_path = cpp_algo(area_map, start_point, center_point=center_point)
             if no_end:
                 coverage_path = cpp_algo(area_map, start_point)
             else:
                 coverage_path = cpp_algo(area_map, start_point, end_point)
+            t_metrics["success"] = True
             t_metrics["cp_compute_time"] = time.time() - t
             c_metrics = coverage_metrics(area_map, coverage_path)
-            t_metrics["success"] = True
         except:
             t_metrics["success"] = False
         
         # Fuel Path calculation.
-        if fuel_paths == True:
+        if fuel_paths == True and t_metrics["success"]:
             n_fuel_stations = np.random.randint(1,5)
             fuel_points = get_random_coords(area_map, n_fuel_stations)
             dm = dist_fill(area_map, fuel_points)
-            fuel_capacity = dm.max() * FC_MAX_DIST_MULTIPLIER
+            temp = dm.max() * FC_DIST_MULTIPLIER
+            fuel_capacity = np.random.randint(int(0.8*temp),int(1.2*temp))
             
             t = time.time()
-            dist_map, _, fuel_paths_, _ = get_fuel_paths(coverage_path, \
+            dist_map, detour_idx, fuel_paths_, _ = get_fuel_paths(coverage_path, \
                                                              area_map, fuel_points, fuel_capacity)
+            full_path,_ = splice_paths(coverage_path, fuel_paths_, detour_idx)
             t_metrics["fp_compute_time"] = time.time() - t
-            f_metrics = fuel_metrics(fuel_paths_, fuel_capacity)
+            f_metrics = fuel_metrics(fuel_paths_, fuel_capacity, full_path, area_map)
             f_metrics["max_dist_fuel"] = dist_map.max()
         
         results.append({
@@ -112,7 +123,6 @@ def single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
         or area map.
     cmap : Which matplotlib color map to use.
     """
-    FC_MAX_DIST_MULTIPLIER = 5
     
     t_metrics = {}
     f_metrics = {}
@@ -132,27 +142,29 @@ def single_robot_single(cpp_algo, area_map, no_end=False, fuel_paths=True, \
             coverage_path = cpp_algo(area_map, start_point)
         else:
             coverage_path = cpp_algo(area_map, start_point, end_point)
+        t_metrics["success"] = True
         t_metrics["cp_compute_time"] = time.time() - t
         c_metrics = coverage_metrics(area_map, coverage_path)
-        t_metrics["success"] = True
     except:
         t_metrics["success"] = False
     
-    if fuel_paths == True:
+    if fuel_paths == True and t_metrics["success"]:
         if fuel_points is None:
             fp_count = np.random.randint(1,5) if fp_count is None else fp_count
             fuel_points = get_random_coords(area_map, fp_count)
             
         if fuel_capacity is None:
             dist_map = dist_fill(area_map, fuel_points)
-            fuel_capacity = dist_map.max() * FC_MAX_DIST_MULTIPLIER
+            temp = dist_map.max() * FC_DIST_MULTIPLIER
+            fuel_capacity = np.random.randint(int(0.8*temp),int(1.2*temp))
 
         t = time.time()
         dist_map, detour_idx, fuel_paths_, fuel_capacity_list = get_fuel_paths(coverage_path, \
                                                              area_map, fuel_points, fuel_capacity)
         
+        full_path,_ = splice_paths(coverage_path, fuel_paths_, detour_idx)
         t_metrics["fp_compute_time"] = time.time() - t
-        f_metrics = fuel_metrics(fuel_paths_, fuel_capacity)
+        f_metrics = fuel_metrics(fuel_paths_, fuel_capacity,full_path, area_map)
         f_metrics["max_dist_fuel"] = dist_map.max()
         
     metrics = {
