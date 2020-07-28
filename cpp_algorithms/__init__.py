@@ -16,3 +16,4 @@ from .testers import single_robot_single
 # Coverage path generation algorithms.
 from .coverage_path.wavefront import wavefront
 from .coverage_path.stc import stc
+from .coverage_path.bcd import bcd

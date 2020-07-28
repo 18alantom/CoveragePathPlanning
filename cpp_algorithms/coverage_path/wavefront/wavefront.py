@@ -31,7 +31,7 @@ def wavefront(area_map,  start_point, center_point=None, isolated_area_check=Tru
         will return the entire path in the form [(x1,y1),...,(xm,ym)]
     else:
         will return a dict with:
-            coverage_path : main coverage path contains not backtracks, will be 
+            coverage_path : main coverage path contains no backtracks, will be 
                 disconnected if there are backtracks.
                 
             backtrack_paths : paths used when the algorithm needs to unstuck
