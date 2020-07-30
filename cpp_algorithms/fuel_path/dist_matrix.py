@@ -1,70 +1,54 @@
 import numpy as np
 from .constants import OB
+from cpp_algorithms.testers.helpers import is_valid
 
-def is_valid(coord, shape):
-    """
-    Checks if a coord is within bounds.
-    """
-    x,y = coord
-    g,h = shape
-    lesser = x < 0 or y < 0
-    greater = x >= g or y >= h
-    if lesser or greater:
-        return False
-    return True
+def is_valid_vectorized(coords, v_map, obstacle=True):
+    # Bound check
+    assert coords.shape[1] == 2
+    h,w = v_map.shape
+    x,y = coords.T
+    is_within_bounds = (x >= 0) & (x < h) & (y >= 0) & (y < w)
+    x = np.clip(x.copy(), 0, h-1)
+    y = np.clip(y.copy(), 0, w-1)
+    is_not_on_obstacle = (v_map[x,y] != obstacle)
+    return is_within_bounds & is_not_on_obstacle
+
+def get_udlr(coords):
+    udlr = np.array([[-1,0],[1,0],[0,-1],[0,1]])[None,:,:]
+    return (coords[:,None,:] + udlr).reshape(-1,2)
+
+def dist_fill_single(area_map, fill_point):
+    v_map = area_map == OB
+    dist_map = area_map.copy()
     
-def get_udlr(dist_map, v_map, center, to_vis):
+    assert is_valid(fill_point, area_map), \
+    "invalid fill point"
+    
+    fval = 0
+    dist_map[fill_point] = fval
+    v_map[fill_point] = True
+    
+    to_visit = np.array([fill_point])
+    while len(to_visit) > 0:
+        x,y = np.array(to_visit).T
+        dist_map[x,y] = fval
+        v_map[x,y] = True
+        udlr = np.unique(get_udlr(to_visit),axis=0)
+        mask = is_valid_vectorized(udlr, v_map)
+        to_visit = udlr[mask]
+        fval += 1
+    return dist_map
+
+def dist_fill(area_map, fill_points):
     """
-    Sets valid non diagonal steps.
-    """
-    x,y = center
-    udlr = [(x,y+1),(x,y-1),(x-1,y),(x+1,y)]
-    sh = dist_map.shape
-    for coord in udlr:
-        if is_valid(coord, sh):
-            is_nob = dist_map[coord] != OB
-            is_vis = v_map[coord]
-            is_pre = coord in to_vis
-            if is_nob and not is_vis and not is_pre:
-                to_vis.append(coord)
-                
-def dist_fill(area_map, points):
-    """
+    Returns the distance matrix.
+
     PARAMETERS
     ---
     area_map : binary map, -1=obstacle, 0=area to be mapped.
     points : [(x,y)] points around which to dist fill (fuel station).
     """
-    shape = area_map.shape
-    dist_map = []
-    v_map = []
-    for _ in points:
-        dm = area_map.copy()
-        dist_map.append(np.int64(dm)) # obs = -1
-        v_map.append((dm == OB).copy())
-    
-    for i,point in enumerate(points):
-        assert is_valid(point, area_map.shape), \
-        "invalid coordinate for center"
-        assert dist_map[i][point] != OB, \
-        "center is an obstacle"
-    
-    for i in range(len(points)):
-        pval = 0
-        center = points[i]
-        dist_map[i][center] = pval
-        v_map[i][center] = True
-
-        to_visit = []
-        get_udlr(dist_map[i], v_map[i], center, to_visit)
-        while len(to_visit) > 0:
-            pval += 1
-            l = len(to_visit)
-            for coord in to_visit:
-                dist_map[i][coord] = pval
-                v_map[i][coord] = True
-
-            for i_ in range(l):
-                coord = to_visit.pop(0)
-                get_udlr(dist_map[i], v_map[i], coord, to_visit)
-    return np.array(dist_map).min(axis=0)
+    dist_maps = []
+    for fill_point in fill_points:
+        dist_maps.append(dist_fill_single(area_map, fill_point))
+    return np.array(dist_maps).min(axis=0)

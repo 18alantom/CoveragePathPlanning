@@ -1,6 +1,6 @@
-from .fuel_path.fuel_path import splice_paths, get_fuel_paths, splice_paths
 from .fuel_path.dist_matrix import dist_fill
 from .fuel_path.constants import OB, NO
+from .fuel_path.fuel_path import splice_paths, get_fuel_paths
 
 from .coverage_path import has_isolated_areas, get_shortest_l1_path
 from .coverage_path import wavefront, wavefront_caller, get_replacement_paths_l1
@@ -15,5 +15,5 @@ from .testers import single_robot_single
 
 # Coverage path generation algorithms.
 from .coverage_path.wavefront import wavefront
-from .coverage_path.stc import stc
 from .coverage_path.bcd import bcd
+from .coverage_path.stc import stc
