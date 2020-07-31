@@ -3,6 +3,7 @@ Some helper functions that are often used.
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from .constants import OB, NO
 from pathlib import Path
 from PIL import Image
 
@@ -156,3 +157,22 @@ def get_all_area_maps(folder_path):
             
     am_idx = np.array([am.size for am in ams]).argsort()
     return list(np.array(ams)[am_idx])
+
+def get_drone_map(A, i, obstacle=OB, coverage=NO):
+    """
+    Returns area map for a single drone 
+    from the assignment matrix.
+    
+    PARAMETERS
+    ---
+    A : assignment matrix obtained from darp.
+    i : the drone number (cell value of A).
+    obstacle : value to assign the obstacle
+    coverage : value to assign the coverage area
+    """
+    am = A.copy()
+    x,y = np.where(am != i)
+    am[x,y] = obstacle
+    x,y = np.where(am == i)
+    am[x,y] = coverage
+    return am 

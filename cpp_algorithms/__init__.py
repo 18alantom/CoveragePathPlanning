@@ -2,7 +2,7 @@
 from .dist_fill import dist_fill
 from .common_helpers import is_valid, adjacency_test
 from .common_helpers import imshow, imshow_scatter
-from .common_helpers import get_all_area_maps, get_random_coords
+from .common_helpers import get_all_area_maps, get_random_coords, get_drone_map
 
 # Division function
 from .darp import darp
