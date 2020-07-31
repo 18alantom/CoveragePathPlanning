@@ -2,6 +2,8 @@ import numpy as np
 
 def stc_caller(matrix):
     bound = matrix.shape
+    
+    #Step 2
     r = int(bound[0]/2)
     c = int(bound[1]/2)
     grid = [[((max(abs((r-1)/2-i), abs((c-1)/2-j))+1) if(all(pt for pg in matrix[2*i:2*(i+1),2*j:2*(j+1)] for pt in pg)) else -1) for j in range(c)] for i in range(r)]
@@ -22,7 +24,7 @@ def stc_caller(matrix):
                             obstacles[(i, j)].append(0)
 
     s = list(vertices.keys())[0]
-
+    # Step 3
     pathf = []
     pathi = {}
     treef = {}
@@ -56,6 +58,7 @@ def stc_caller(matrix):
             treef[path[i-1]][ind] = 1
             treef[path[i]][(ind+2)%4] = 1
 
+    # Step 4
     a = np.array([len(i) for i in pathf])
     b = np.argsort(a)
     allPaths = [list(pathf[i].keys()) for i in range(len(pathf))]
@@ -96,41 +99,48 @@ def stc_caller(matrix):
         treef[path[0]][ind] = 1
         treef[path[1]][(ind+2)%4] = 1
 
+    # Step 5
+    def getNextPoint(vertex, vertex_grid):
+        if vertex[0]%2==0 and vertex[1]%2==0:
+            if treef[vertex_grid][0]:
+                return (vertex[0]-1, vertex[1])
+            else:
+                return (vertex[0], vertex[1]+1)
+        elif vertex[0]%2==0:
+            if treef[vertex_grid][1]:
+                return (vertex[0], vertex[1]+1)
+            else:
+                return (vertex[0]+1, vertex[1])
+        elif vertex[1]%2==0:
+            if treef[vertex_grid][3]:
+                return (vertex[0], vertex[1]-1)
+            else:
+                return (vertex[0]-1, vertex[1])
+        else:
+            if treef[vertex_grid][2]:
+                return (vertex[0]+1, vertex[1])
+            else:
+                return (vertex[0], vertex[1]-1)
+
     finalPathf = {}
     k = 0
     for i in set(edgePath):
         finalPath = {}
         vertex = tuple(2*a for a in (list(pathf[i].keys())[0]))
         svertex = vertex
-        while True:
-            vertex_grid = tuple(int(a/2) for a in vertex)
-            if vertex[0]%2==0 and vertex[1]%2==0:
-                if treef[vertex_grid][0]:
-                    vertex2 = (vertex[0]-1, vertex[1])
-                else:
-                    vertex2 = (vertex[0], vertex[1]+1)
-            elif vertex[0]%2==0:
-                if treef[vertex_grid][1]:
-                    vertex2 = (vertex[0], vertex[1]+1)
-                else:
-                    vertex2 = (vertex[0]+1, vertex[1])
-            elif vertex[1]%2==0:
-                if treef[vertex_grid][3]:
-                    vertex2 = (vertex[0], vertex[1]-1)
-                else:
-                    vertex2 = (vertex[0]-1, vertex[1])
-            else:
-                if treef[vertex_grid][2]:
-                    vertex2 = (vertex[0]+1, vertex[1])
-                else:
-                    vertex2 = (vertex[0], vertex[1]-1)
-            finalPath[vertex] = vertex2
-            vertex = vertex2
-            if vertex==svertex:
-                break
+        pvertex = vertex
+        vertex = getNextPoint(vertex, tuple(int(a/2) for a in vertex))
+        nvertex = getNextPoint(vertex, tuple(int(a/2) for a in vertex))
+        finalPath[vertex] = {pvertex:nvertex}
+        while vertex!=svertex:
+            pvertex = vertex
+            vertex = nvertex
+            nvertex = getNextPoint(vertex, tuple(int(a/2) for a in vertex))
+            finalPath[vertex] = {pvertex:nvertex}
         finalPathf[k] = finalPath
         k += 1
 
+    # Step 6
     def nextPoint(ap, i):
         if i==0:
             return (ap[0], ap[1]-1) if ap[1]-1>=0 else None
@@ -159,49 +169,40 @@ def stc_caller(matrix):
         return -1
 
     def findBefore(p_, pn2):
-        for i in range(4):
-            np = nextPoint(p_, i)
-            if np!=None and np in finalPathf[pn2]:
-                if type(finalPathf[pn2][np])!=dict and finalPathf[pn2][np]==p_:
-                    return np
-                elif type(finalPathf[pn2][np])==dict:
-                    for j in finalPathf[pn2][np]:
-                        if p_==finalPathf[pn2][np][j]: return np
+        return list(finalPathf[pn2][p_])[0]
 
-    def insertPath(pi, po, pp, a, b):
-        if type(finalPathf[pp][pi])!=dict and finalPathf[pp][pi]!=po: return False
-        elif type(finalPathf[pp][pi])==dict:
-            flag = False
-            for i in finalPathf[pp][pi]:
-                if finalPathf[pp][pi][i]==po:
-                    flag = True
-                    break
-            if not flag: return flag
-            finalPathf[pp][pi][i] = a
-            finalPathf[pp][a] = b
-            finalPathf[pp][b] = po
-        else:
-            #print(pi, po, pp, a, b)
-            finalPathf[pp][pi] = a
-            finalPathf[pp][a] = b
-            finalPathf[pp][b] = po
-
-        if type(finalPathf[pp][po])==dict:
-            finalPathf[pp][po][b] = finalPathf[pp][po][pi]
-            del finalPathf[pp][po][pi]
-
+    def insert2(pi, po, pp, a, b):
+        if pi not in finalPathf[pp][po]: return False
+        pi_p = None
+        for i in finalPathf[pp][pi]:
+            if finalPathf[pp][pi][i]==po:
+                pi_p = i
+                break
+        if pi_p==None:
+            print("Error", pi, po, pp)
+            return False
+        finalPathf[pp][pi][pi_p] = a
+        finalPathf[pp][a] = {pi:b}
+        finalPathf[pp][b] = {a:po}
+        finalPathf[pp][po][b] = finalPathf[pp][po][pi]
+        del finalPathf[pp][po][pi]
         return True
 
-    def addBacktrack(pa, a, na, b, poa):
+    def insert1(a, poa, b):
+        pa = findBefore(a, poa)
+        finalPathf[poa][a][b] = finalPathf[poa][a][pa]
+        finalPathf[poa][a][pa] = b
+
+    def joinPath(a, poa, drc):
+        b = nextPoint(a, drc)
         pob = ifInPath(b)
-        if pob==poa or pob<0: return poa
-        #print(pa, a, na, b, poa)
-        finalPathf[poa][a] = {pa:b, b:na}
-        finalPathf[pob][b] = {a:finalPathf[pob][b], findBefore(b, pob):a}
-        if len(finalPathf[poa]) < len(finalPathf[pob]):
-            tmp = poa
+        if poa==pob or pob<0: return poa
+        insert1(a, poa, b)
+        insert1(b, pob, a)
+        if len(finalPathf[poa])<len(finalPathf[pob]):
+            potmp = poa
             poa = pob
-            pob = tmp
+            pob = potmp
         finalPathf[poa].update(finalPathf[pob])
         del finalPathf[pob]
         return poa
@@ -216,16 +217,12 @@ def stc_caller(matrix):
             b = actualPoint(ogrid, i-1)
             b_ = nextPoint(b, i)
             if b_==None or b_ not in finalPathf[pn1]: continue
-            #print(a_, b, pn1, a, b)
-            if not insertPath(a_, b_, pn1, a, b): continue
-            #print(finalPathf[pn1][a_], finalPathf[pn1][a], finalPathf[pn1][b], finalPathf[pn1][b_])
-            a__ = nextPoint(a, (i+1)%4)
-            pn1 = addBacktrack(a_, a, b, a__, pn1)
-            b__ = nextPoint(b, i-1)
-            addBacktrack(a, b, b_, b__, pn1)
+            if not insert2(a_, b_, pn1, a, b): continue
+            pn1 = joinPath(a, pn1, (i+1)%4)
             obstacles[ogrid][i] = -1
             obstacles[ogrid][i-1] = -1
 
+    # Step 7
     def addInFinalPath(tmpDict):
         lastEntry = list(finalPathf)[-1]
         finalPathf[lastEntry+1] = tmpDict
@@ -245,12 +242,13 @@ def stc_caller(matrix):
                     if ao!=None and pao>=0:
                         a_o = nextPoint(a_, (i+1)%4)
                         pa_o = ifInPath(a_o)
-                        if a_o!=None and pa_o==pao and insertPath(ao, a_o, pao, a, a_):
+                        if a_o!=None and pa_o==pao and insert2(ao, a_o, pao, a, a_):
                             flaga = 2
                         else:
                             flaga = 1
                     else:
                         flaga = 1
+
             if obstacles[ogrid][i-1]==1:
                 b = actualPoint(ogrid, i-1)
                 b_ = nextPoint(b, i)
@@ -261,19 +259,22 @@ def stc_caller(matrix):
                     if bo!=None and pbo>=0:
                         b_o = nextPoint(b_, i-1)
                         pb_o = ifInPath(b_o)
-                        if b_o!=None and pb_o==pbo and insertPath(b_o, bo, pbo, b_, b):
+                        if b_o!=None and pb_o==pbo and insert2(b_o, bo, pbo, b_, b):
                             flagb = 2
-                            if flaga==1 and not insertPath(b_, b, pbo, a_, a):
+                            if flaga==1 and not insert2(b_, b, pbo, a_, a):
                                 flaga=0
                             elif flaga==2:
                                 if pbo!=pao:
-                                    finalPathf[pbo][a] = b
-                                    finalPathf[pbo][b_] = a_
+                                    finalPathf[pao][a][ao] = b
+                                    finalPathf[pbo][b][a] = bo
+                                    finalPathf[pbo][b][b_o] = a_
+                                    finalPathf[pao][a_][b_] = ao
                                     if len(finalPathf[pbo])>len(finalPathf[pao]):
                                         tmpo = pbo
                                         pbo = pao
                                         pao = tmpo
                                     finalPathf[pao].update(finalPathf[pbo])
+
                                     del finalPathf[pbo]
                         else:
                             flagb = 1
@@ -282,71 +283,59 @@ def stc_caller(matrix):
                     if flagb==1:
                         if flaga==1:
                             tmpcp = {}
-                            tmpcp[a] = b
-                            tmpcp[b] = b_
-                            tmpcp[b_] = a_
-                            tmpcp[a_] = a
-                            #pao = addInFinalPath(tmpcp)
-                        elif flaga==2 and not insertPath(a, a_, pao, b, b_):
+                            tmpcp[a] = {a_:b}
+                            tmpcp[b] = {a:b_}
+                            tmpcp[b_] = {b:a_}
+                            tmpcp[a_] = {b_:a}
+                            pao = addInFinalPath(tmpcp)
+                        elif flaga==2 and not insert2(a, a_, pao, b, b_):
                             flagb=0
             if flaga==2 or (flaga==1 and flagb!=0):
                 obstacles[ogrid][i] = -1
                 obstacles[nextPoint(ogrid, i)][(i+1)%4] = -1
             if flagb==2 or (flagb==1 and flaga!=0):
                 obstacles[ogrid][i-1] = -1
-                obstacles[nextPoint(ogrid, i)][i-1] = -1
+                obstacles[nextPoint(ogrid, i)][(i+2)%4] = -1
             if flaga==2 and flagb==0:
                 #ind a backtr
-                a__ = nextPoint(a, (i+2)%4)
-                pao = addBacktrack(ao, a, a_, a__, pao)
-                a___ = nextPoint(a_, i)
-                addBacktrack(a, a_, a_o, a___, pao)
+                pao = joinPath(a, pao, (i+2)%4)
+                joinPath(a_, pao, i)
             elif flagb==2 and flaga==0:
                 #ind b backtr
-                b___ = nextPoint(b_, i)
-                pbo = addBacktrack(b_o, b_, b, b___, pbo)
-                b__ = nextPoint(b, (i+2)%4)
-                addBacktrack(b_, b, bo, b__, pbo)
+                pbo = joinPath(b_, pbo, i)
+                joinPath(b, pbo, (i+2)%4)
             elif flaga!=0 and flagb!=0:
                 if flaga==2 and flagb==1:
                     #b on a back
-                    a__ = nextPoint(a, (i+2)%4)
-                    pao = addBacktrack(ao, a, b, a__, pao)
-                    b__ = nextPoint(b, i)
-                    pao = addBacktrack(a, b, b_, b__, pao)
-                    b___ = nextPoint(b_, i)
-                    pao = addBacktrack(b, b_, a_, b___, pao)
-                    a___ = nextPoint(a_, (i+2)%4)
-                    addBacktrack(b_, a_, a_o, a___, pao)
+                    pao = joinPath(a, pao, (i+2)%4)
+                    pao = joinPath(b, pao, i-1)
+                    pao = joinPath(b, pao, (i+2)%4)
+                    pao = joinPath(b_, pao, i)
+                    pao = joinPath(b_, pao, i-1)
+                    joinPath(a_, pao, i)
                 elif flagb==2 and flaga==1:
                     #a on b back
-                    b__ = nextPoint(b, i)
-                    pbo = addBacktrack(b_o, b_, a_, b___, pbo)
-                    a__ = nextPoint(a, (i+2)%4)
-                    pbo = addBacktrack(b_, a_, a, a___, pbo)
-                    a___ = nextPoint(a_, (i+2)%4)
-                    pbo = addBacktrack(a_, a, b, a__, pbo)
-                    b___ = nextPoint(b_, i)
-                    addBacktrack(a, b, bo, b__, pbo)
+                    pbo = joinPath(b_, pbo, i)
+                    pbo = joinPath(a_, pbo, i)
+                    pbo = joinPath(a_, pbo, (i+1)%4)
+                    pbo = joinPath(a, pbo, (i+1)%4)
+                    pbo = joinPath(a, pbo, (i+2)%4)
+                    joinPath(b, pbo, (i+2)%4)
                 elif flaga==2 and flagb==2:
                     #a and b bck
-                    a__ = nextPoint(a, (i+2)%4)
-                    pao = addBacktrack(ao, a, b, a__, pao)
-                    b__ = nextPoint(b, i)
-                    pao = addBacktrack(a, b, bo, b__, pao)
-                    b___ = nextPoint(b_, i)
-                    pao = addBacktrack(b_o, b_, a_, b___, pao)
-                    a___ = nextPoint(a_, (i+2)%4)
-                    addBacktrack(b_, a_, a_o, a___, pao)
+                    pao = joinPath(a, pao, (i+2)%4)
+                    pao = joinPath(b, pao, (i+2)%4)
+                    pao = joinPath(b_, pao, i)
+                    joinPath(a_, pao, i)
                 else:
-                    a__ = nextPoint(a, (i+2)%4)
-                    pao = addBacktrack(a_, a, b, a__, pao)
-                    b__ = nextPoint(b, i)
-                    pao = addBacktrack(a, b, b_, b__, pao)
-                    b___ = nextPoint(b_, i)
-                    pao = addBacktrack(b, b_, a_, b___, pao)
-                    a___ = nextPoint(a_, (i+2)%4)
-                    addBacktrack(b_, a_, a, a___, pao)
+                    pao = joinPath(a, pao, (i+1)%4)
+                    pao = joinPath(a, pao, (i+2)%4)
+                    pao = joinPath(b, pao, (i+2)%4)
+                    pao = joinPath(b, pao, i-1)
+                    pao = joinPath(b_, pao, i-1)
+                    pao = joinPath(b_, pao, i)
+                    pao = joinPath(a_, pao, i)
+                    joinPath(a_, pao, (i+1)%4)
 
             elif flaga==1 and i==0:
                 au = nextPoint(a, 1)
@@ -356,10 +345,10 @@ def stc_caller(matrix):
                     pad = ifInPath(ad)
                     if ad!=None and pad==-1:
                         tmpcp = {}
-                        tmpcp[a_] = ad
-                        tmpcp[ad] = au
-                        tmpcp[au] = a
-                        tmpcp[a] = a_
+                        tmpcp[a_] = {a:ad}
+                        tmpcp[ad] = {a_:au}
+                        tmpcp[au] = {ad:a}
+                        tmpcp[a] = {au:a_}
                         pao = addInFinalPath(tmpcp)
                         obstacles[ogrid][i] = -1
                         obstacles[nextPoint(ogrid, 0)][1] = -1
@@ -368,43 +357,51 @@ def stc_caller(matrix):
 
                         tmpcp = list(tmpcp)
                         for ij in range(4):
-                            n1_ = nextPoint(tmpcp[ij], ij)
-                            pao = addBacktrack(tmpcp[ij-1], tmpcp[ij], tmpcp[(ij+1)%4], n1_, pao)
-                            n2_ = nextPoint(tmpcp[(ij+1)%4], ij)
-                            addBacktrack(tmpcp[ij], tmpcp[(ij+1)%4], tmpcp[(ij+2)%4], n2_, pao)
+                            pao = joinPath(tmpcp[ij], pao, ij)
+                            pao = joinPath(tmpcp[(ij+1)%4], pao, ij)
         if all(obstacles[ogrid][i]!=1 for i in range(4)): del obstacles[ogrid]
 
-    while(len(obstacles)!=0):
+    # Step 8
+    while True:
+        flag = True
         for ogrid in list(obstacles):
             for i in range(3, -1, -1):
                 if obstacles[ogrid][i]==1:
                     a = actualPoint(ogrid, i)
+                    tmpflag = 0
                     for j in range(4):
                         npt = nextPoint(a, j)
                         ppt = ifInPath(npt)
-                        if npt!=None and ppt>=0:
+                        if npt!=None and ppt==-2: tmpflag += 1
+                        elif npt!=None and ppt>=0:
                             pnpt = findBefore(npt, ppt)
-                            if type(finalPathf[ppt][npt])==dict:
-                                finalPathf[ppt][npt][a] = finalPathf[ppt][npt][pnpt]
-                                finalPathf[ppt][npt][pnpt] = a
-                            else:
-                                finalPathf[ppt][npt] = {pnpt:a, a:finalPathf[ppt][npt]}
-                            finalPathf[ppt][a] = npt
+                            finalPathf[ppt][npt][a] = finalPathf[ppt][npt][pnpt]
+                            finalPathf[ppt][npt][pnpt] = a
+                            finalPathf[ppt][a] = {npt:npt}
+                            for k in range(j+1, 4):
+                                ppt = joinPath(a, ppt, k)
                             obstacles[ogrid][i] = -1
+                            flag = False
                             break
+                    if tmpflag==4: obstacles[ogrid][i] = -1
             if all(obstacles[ogrid][i]!=1 for i in range(4)): del obstacles[ogrid]
+        if len(obstacles)==0 or flag: break
 
+    # Step 9
     coverage_path = []
     for ind in finalPathf:
         i = finalPathf[ind]
-        psvertex = list(i.keys())[0]
-        svertex = i[psvertex][list(i[psvertex].keys())[0]] if type(i[psvertex])==dict else i[psvertex]
-        pvertex = psvertex
-        vertex = svertex
+        pvertex = list(i.keys())[0]
+        vertex = i[pvertex][list(i[pvertex].keys())[0]] if type(i[pvertex])==dict else i[pvertex]
+
         while True:
+#             matrix[vertex] = 127
             coverage_path.append(vertex)
-            tmp = pvertex
+            if vertex not in i or pvertex not in i[vertex]: break
+            psvertex = pvertex
             pvertex = vertex
-            vertex = i[vertex][tmp] if type(i[vertex])==dict else i[vertex]
-            if vertex==svertex and pvertex==psvertex: break
+            vertex = i[pvertex][psvertex]
+            del i[pvertex][psvertex]
+            if len(i[vertex])==0:
+                del i[vertex]
     return coverage_path
