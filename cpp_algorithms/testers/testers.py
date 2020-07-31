@@ -139,6 +139,7 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
     dist_map = None
     detour_idx = None
     fuel_capacity_list = None
+    coverage_path = None
     start_point = get_random_coords(
         area_map, 1)[0] if start_point is None else start_point
     end_point = get_random_coords(
@@ -183,6 +184,7 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
         **c_metrics,
         **f_metrics,
     }
+
     values = {
         "area_map": area_map,
         "coverage_path": coverage_path,
@@ -195,6 +197,8 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
         "end_point": end_point,
         "fuel_capacity_list": fuel_capacity_list
     }
+    if coverage_path is None:
+        return metrics, values
 
     if not animate and show_paths:
         path_show(area_map, coverage_path, fuel_paths_,
