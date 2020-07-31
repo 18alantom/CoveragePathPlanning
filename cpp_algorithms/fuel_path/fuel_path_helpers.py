@@ -1,5 +1,6 @@
 import numpy as np
-from .constants import FU, OB
+from copy import deepcopy
+from cpp_algorithms.constants import FU, OB
 
 def udlr(x,y):
     # Up Down Left Right
@@ -105,3 +106,61 @@ def get_refuel_idx(dist_map, coverage_path, fuel_cap):
         points.append(cu)
         fuel_req = dist[cu]
     return points, fcap
+
+def splice_paths(coverage_path, fuel_paths, detour_idx, double_center=False):
+    """
+    Inserts detour path to the fuelling station into the original path
+    and returns it along with start and end indices of the full path which.
+
+    PARAMETERS
+    ---
+    coverage_path : the drone coverage path as a list of tuples
+        [(x1,y1),...,(xm,ym)]
+
+    fuel_paths : list of fuel paths
+        [[(x1,y1),...,(xn,yn)],...,[...]]
+
+    detour_idx : indices where the drone takes a detour from the main path.
+
+    double_center : whether the fuel point coordinate should be repeated.
+
+
+    RETURNS
+    ---
+    full_path : The entire path of the drone on the map.
+
+    detour_start_end_idx : Indices of the full path where
+        detour starts and ends, they are the same coords.
+        (start, end) 
+    """
+    coverage_path = deepcopy(coverage_path)
+    fuel_paths = deepcopy(fuel_paths)
+    detour_start_end_idx = []
+    segments = []
+    last_idx = 0
+    cumu_len = 0
+    for idx,fuel_path in zip(detour_idx,fuel_paths):
+        s_e = []
+        
+        seg = np.array(coverage_path[last_idx:idx])
+        segments.append(seg)
+        cumu_len += seg.shape[0]
+        s_e.append(cumu_len)
+        
+        if double_center:
+            splice_in = [*fuel_path,*fuel_path[::-1][:-1]]
+        else:
+            splice_in = [*fuel_path,*fuel_path[::-1][1:-1]]
+        
+        seg = np.array(splice_in)
+        cumu_len += seg.shape[0]
+        s_e.append(cumu_len)
+        
+        detour_start_end_idx.append(tuple(s_e))
+        segments.append(seg)
+        last_idx = idx
+    
+    segments.append(coverage_path[last_idx:])
+    full_path = np.concatenate(segments)
+    
+    return full_path, detour_start_end_idx

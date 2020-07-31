@@ -1,6 +1,6 @@
 from .wavefront_caller import wavefront_caller
 from .wavefront_helpers import get_replacement_paths_l1
-from cpp_algorithms.testers import get_random_coords
+from cpp_algorithms.common_helpers import get_random_coords
 from cpp_algorithms.coverage_path.pathing_helpers import splice_paths, has_isolated_areas
 
 def wavefront(area_map,  start_point, center_point=None, isolated_area_check=True,

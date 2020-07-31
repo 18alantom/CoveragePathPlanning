@@ -1,6 +1,6 @@
 import numpy as np
-from cpp_algorithms.testers import is_valid
-from cpp_algorithms.fuel_path.dist_matrix import dist_fill
+from cpp_algorithms.dist_fill import dist_fill
+from cpp_algorithms.common_helpers import is_valid
 from .wavefront_helpers import get_next_valid, update_keeper, backtrack_subroutine
 
 def wavefront_update(keeper, obstacle):

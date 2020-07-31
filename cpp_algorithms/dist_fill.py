@@ -1,6 +1,7 @@
 import numpy as np
 from .constants import OB
-from cpp_algorithms.testers.helpers import is_valid
+from .common_helpers import is_valid
+# from cpp_algorithms.testers.helpers import is_valid
 
 def is_valid_vectorized(coords, v_map, obstacle=True):
     # Bound check
@@ -19,7 +20,7 @@ def get_udlr(coords):
 
 def dist_fill_single(area_map, fill_point):
     v_map = area_map == OB
-    dist_map = area_map.copy()
+    dist_map = area_map.copy().astype(np.int32)
     
     assert is_valid(fill_point, area_map), \
     "invalid fill point"

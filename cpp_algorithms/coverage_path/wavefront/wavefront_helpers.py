@@ -1,5 +1,5 @@
 # import is_valid
-from cpp_algorithms.testers import is_valid
+from cpp_algorithms.common_helpers import is_valid
 from cpp_algorithms.coverage_path.pathing_helpers import get_shortest_l1_path
 import numpy as np
 

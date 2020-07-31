@@ -1,5 +1,5 @@
 import numpy as np
-from cpp_algorithms.testers import is_valid
+from cpp_algorithms.common_helpers import is_valid
 
 def bcd_preprocess(area_map):
     """

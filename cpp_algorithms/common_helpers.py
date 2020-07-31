@@ -46,7 +46,7 @@ def generate_point_obstacles(area_map, p=0.5):
     area_map[np.random.rand(*area_map.shape)<p] =  -1
     return area_map
 
-def get_area_map(path, area=0,obs=-1):
+def get_area_map(path, area=0, obs=-1):
     """
     path : path to area map png, png should have only 
     0 255 as values.

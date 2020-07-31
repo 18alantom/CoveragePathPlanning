@@ -1,6 +1,5 @@
 import numpy as np
-from cpp_algorithms.testers import get_random_coords
-from cpp_algorithms.testers import is_valid
+from cpp_algorithms.common_helpers import is_valid, get_random_coords
 
 get_adj = lambda x,y :[
     (x+1,y),(x-1,y),(x,y+1),(x,y-1)

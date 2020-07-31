@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-from .helpers import imshow
-from cpp_algorithms.fuel_path.fuel_path import splice_paths
+from cpp_algorithms.common_helpers import imshow
+from cpp_algorithms.fuel_path import splice_paths
 
 def printer(metrics):
     for m in metrics:
