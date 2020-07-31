@@ -17,8 +17,12 @@
         <input type="number"     class="input-field1" name='drones' id='drones' placeholder="Number of drones" required>
         <input type="number"     class="input-field1" name='ranges' id='ranges' placeholder="Range (in km based on battery life)" required>
         <input type="number"     class="input-field1" name='speed' id='speed' placeholder="Top speed"required>
+        <input type="number"     class="input-field1" name='altitude' id='altitude' placeholder="Altitude(Height)"required>
+        <input type="number"     class="input-field1" name='angle' id='angle' placeholder="Field Of Vision(Angle)"required>
+
+
         
-        <button type="submit" onclick="submit_entry();" class="submit-btn1"><b>Proceed</b></button>
+        <button type="submit" href="/shconv_2" onclick="submit_entry();" class="submit-btn1"><b>Proceed</b></button>
     </form>
 
     </div>
@@ -27,19 +31,44 @@
         
         function submit_entry()
         {
-            var drones=document.getElementById("drones")
-            var ranges=document.getElementById("ranges")
-            var speed=document.getElementById("speed")
-            var location=document.getElementById("location")
+            var drones=document.getElementById("drones");
+            var ranges=document.getElementById("ranges");
+            var speed=document.getElementById("speed");
+            var altitude=document.getElementById("altitude");
+            var angle=document.getElementById("angle");
 
-            var entry ={
-                drones=drones.value
-                ranges=ranges.value
-                location=location.value
-                speed=speed.value
+
+
+            var entry1 ={
+                drones:drones.value,
+                ranges:ranges.value,
+                speed:speed.value,
+                altitude:altitude.value,
+                angle:angle.value
             };
+            console.log('hi')
+            fetch(`${window.origin}/input/hello`, {
+               method: "POST",
+               credentials: "include",
+               body: JSON.stringify(entry1),
+               cache: "no-cache",
+               headers: new Headers({
+                 "content-type": "application/json"
+               })
+            })
+            .then(function(response) {
+              if (response.status !== 200) {
+                console.log(`Looks like there was a problem. Status code: ${response.status}`);
+                return;
+               }
+             response.json().then(function(data) {
+             console.log(data);
+             });
+            })
+            .catch(function(error) {
+              console.log("Fetch error: " + error);
+            });
 
-            console.log(entry);
 
         }
     </script>
