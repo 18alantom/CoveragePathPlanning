@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="/static/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="/static/input_style.css" rel="stylesheet" type="text/css">
+	<link href="/static/icofont.min.css" rel="stylesheet">
+	<title> INPUT PAGE </title>
+</head>
+<body>
+    <div class="hero1">
+    <div class="form-box1">
+
+    <form id="register1"   method="post"  class="input-group1">
+    	<h1><b>INPUTS FOR THE PROGRAM</b></h1>
+        <input type="number"     class="input-field1" name='drones' id='drones' placeholder="Number of drones" required>
+        <input type="number"     class="input-field1" name='ranges' id='ranges' placeholder="Range (in km based on battery life)" required>
+        <input type="number"     class="input-field1" name='speed' id='speed' placeholder="Top speed"required>
+        
+        <button type="submit" onclick="submit_entry();" class="submit-btn1"><b>Proceed</b></button>
+    </form>
+
+    </div>
+    </div>
+    <script>
+        
+        function submit_entry()
+        {
+            var drones=document.getElementById("drones")
+            var ranges=document.getElementById("ranges")
+            var speed=document.getElementById("speed")
+            var location=document.getElementById("location")
+
+            var entry ={
+                drones=drones.value
+                ranges=ranges.value
+                location=location.value
+                speed=speed.value
+            };
+
+            console.log(entry);
+
+        }
+    </script>
+</body>
+</html>
