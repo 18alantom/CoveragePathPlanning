@@ -1,3 +1,6 @@
+# Main caller
+from .cpp import cpp
+
 # Helper functions
 from .dist_fill import dist_fill
 from .common_helpers import is_valid, adjacency_test
@@ -19,3 +22,6 @@ from .fuel_path import get_fuel_paths
 # Testing functions
 from .testers import single_robot_single 
 from .testers import single_robot_multiple
+
+# Rasterization functions
+from .rasterize import rasterize
