@@ -3,6 +3,8 @@ from .rasterize import rasterize
 KEY = "type"
 AREAS = ["coverage", "obstacle"]
 POINTS = ["drone", "fuel"]
+POINT = "Point"
+POLYG = "Polgon"
 FEATURES = [*AREAS, *POINTS]
 
 def get_features_dict(shapefiles, key=KEY, fnames=FEATURES):
@@ -42,7 +44,6 @@ def get_points_dict(features, points_keys = ['drone', 'fuel']):
         for point in features[key]:
             points['type'].append(key)
             points['points'].append(point)
-        
     return points
 
 def get_gpdframe(geo_json):
@@ -74,4 +75,3 @@ def conversion(side, geo_json):
 	points = get_points_dict(features)
 	area_map, imp_points = rasterize(side, final_coverage, points['points'])
 	return area_map, imp_points
-
