@@ -4,7 +4,7 @@ KEY = "type"
 AREAS = ["coverage", "obstacle"]
 POINTS = ["drone", "fuel"]
 POINT = "Point"
-POLYG = "Polgon"
+POLYG = "Polygon"
 FEATURES = [*AREAS, *POINTS]
 
 def get_features_dict(shapefiles, key=KEY, fnames=FEATURES):
