@@ -44,16 +44,34 @@ def get_points_dict(features, points_keys = ['drone', 'fuel']):
             points['points'].append(point)
         
     return points
+
+def get_gpdframe(geo_json):
+    # Change all constantns
+    gpdframe = []
+    for gj in geo_json:
+        temp = []
+        for feature in gj['features']:
+            if gj['fileName'] == POINT:
+                geom = shapely.geometry.Point(feature['geometry']['coordinates'])
+            elif gj['fileName'] == POLYG:
+                assert len(feature['geometry']['coordinates']) == 1, "yo there be more stuff here 👈"
+                geom = shapely.geometry.Polygon(feature['geometry']['coordinates'][0])
+            temp.append({
+                KEY: feature['properties']['type'],
+                'geometry': geom
+            })
+        gpdframe.append(geopandas.GeoDataFrame(temp))
+    return gpdframe
   
-def conversion(side, shapefiles):
+def conversion(side, geo_json):
 	"""
 	side : drone area of coverage square's side in meters.
-	shapefiles : list of geopandas dataframes 
-		created from shapefiles.
+	geo_json : parsed json in the geojson fromat from the frontend.
 	"""
+	shapefiles = get_gpdframe(geo_json)
 	features = get_features_dict(shapefiles)
 	final_coverage = get_final_coverage_polygon(features)
 	points = get_points_dict(features)
-	area_map, imp_points = rasterize(100, final_coverage, points['points'])
+	area_map, imp_points = rasterize(side, final_coverage, points['points'])
 	return area_map, imp_points
 
