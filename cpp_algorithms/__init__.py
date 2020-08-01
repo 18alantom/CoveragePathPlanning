@@ -24,4 +24,4 @@ from .testers import single_robot_single
 from .testers import single_robot_multiple
 
 # Rasterization functions
-from .rasterize import rasterize
+from .rasterize import conversion
