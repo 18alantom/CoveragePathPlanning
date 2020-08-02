@@ -1,3 +1,4 @@
+import numpy as np
 import geopandas
 import json
 from .rasterize import rasterize
@@ -88,4 +89,5 @@ def conversion(side, geo_json):
     final_coverage = get_final_coverage_polygon(features)
     points = get_points_dict(features)
     area_map, imp_points, lookup_c = rasterize(side, final_coverage, points['points'])
-    return area_map, imp_points, lookup_c
+    lnglat = np.float64(np.stack(np.vectorize(lambda x:list(x.coords)[0])(lookup_c)).T)
+    return area_map, imp_points, lnglat
