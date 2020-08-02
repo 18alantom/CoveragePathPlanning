@@ -1,7 +1,7 @@
-import shapely.geometry
 import geopandas
 import json
 from .rasterize import rasterize
+import shapely.geometry
 
 KEY = "type"
 AREAS = ["coverage", "obstacle"]
@@ -87,5 +87,5 @@ def conversion(side, geo_json):
     features = get_features_dict(shapefiles)
     final_coverage = get_final_coverage_polygon(features)
     points = get_points_dict(features)
-    area_map, imp_points = rasterize(side, final_coverage, points['points'])
-    return area_map, imp_points
+    area_map, imp_points, lookup_c = rasterize(side, final_coverage, points['points'])
+    return area_map, imp_points, lookup_c

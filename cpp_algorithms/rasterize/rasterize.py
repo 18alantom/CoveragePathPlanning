@@ -69,4 +69,4 @@ def rasterize(side, coverage_area, imp_points):
                             
     raster[0] = -1
     raster[:,-1] = -1
-    return raster, imp_coords
+    return raster, imp_coords, lookup_c
