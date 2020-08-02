@@ -94,7 +94,7 @@ def conversion(side, geo_json):
         lambda x: list(x.coords)[0])(lookup_c)).transpose(1, 2, 0))
     return area_map, imp_points, lnglat
 
-# from cpp_
+# from cpp_algorithms import cp_to_latlng
 def cp_to_latlng(lookup_c, coverage_paths):
     """
     Return's coverage_path in the form of [{"lat":lat,"lng":lng},....,{...}]
