@@ -88,6 +88,8 @@ def conversion(side, geo_json):
     features = get_features_dict(shapefiles)
     final_coverage = get_final_coverage_polygon(features)
     points = get_points_dict(features)
-    area_map, imp_points, lookup_c = rasterize(side, final_coverage, points['points'])
-    lnglat = np.float64(np.stack(np.vectorize(lambda x:list(x.coords)[0])(lookup_c)).T)
+    area_map, imp_points, lookup_c = rasterize(
+        side, final_coverage, points['points'])
+    lnglat = np.float64(np.stack(np.vectorize(
+        lambda x: list(x.coords)[0])(lookup_c)).transpose(1, 2, 0))
     return area_map, imp_points, lnglat
