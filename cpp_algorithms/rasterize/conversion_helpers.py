@@ -93,3 +93,10 @@ def conversion(side, geo_json):
     lnglat = np.float64(np.stack(np.vectorize(
         lambda x: list(x.coords)[0])(lookup_c)).transpose(1, 2, 0))
     return area_map, imp_points, lnglat
+
+
+def cp_to_latlng(lookup_c, coverage_paths):
+    """
+    Return's coverage_path in the form of [{"lat":lat,"lng":lng},....,{...}]
+    """
+    return [[{"lat": lookup_c[j][1], "lng":lookup_c[j][0]} for j in i] for i in coverage_paths]
