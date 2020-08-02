@@ -20,8 +20,8 @@ from .fuel_path import splice_paths
 from .fuel_path import get_fuel_paths
 
 # Testing functions
-from .testers import single_robot_single 
+from .testers import single_robot_single
 from .testers import single_robot_multiple
 
 # Rasterization functions
-from .rasterize import conversion
+from .rasterize import conversion, cp_to_latlng
