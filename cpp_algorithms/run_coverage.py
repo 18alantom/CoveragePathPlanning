@@ -25,12 +25,21 @@ def run_coverage(geojson, altitude=None, fov=None, side=None,
     """
     if side == None:
         try:
-            side = altitude*np.tan(fov/(180/np.pi))
+            side = altitude*np.tsan(fov/(180/np.pi))
         except:
             raise ValueError("no way to calculate coverage area")
     area_map, points, types, retransformer = conversion(side, geojson)
-    start_points = points[types.index(START)]
-    fuel_points = points[types.index(FUEL)]
+
+    try:
+        start_points = points[types.index(START)]
+    except:
+        raise Exception("terrible error :: no start location")
+
+    try:
+        fuel_points = points[types.index(FUEL)]
+    except:
+        print("no fuel points found")
+
     coverage_paths, full_paths, detour_idxes = cpp(
         area_map, start_points, fuel_points, fuel_capacity, online, epochs, use_flood, drone_speed, drone_coverage, pbar=pbar)
     if full_paths is None:

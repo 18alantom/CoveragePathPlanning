@@ -1,3 +1,7 @@
+from .conversion_helpers import get_scale, get_gpdframe
+from .conversion_helpers import create_gdframe
+from .conversion_helpers import get_features_dict, get_final_coverage_polygon
+import json
 import shapely
 import geopandas as gpd
 import numpy as np
@@ -69,10 +73,6 @@ def down_sample(side, area_map, points, meter=1):
         temp[temp == val] = 0
     return temp, points
 
-from .conversion_helpers import get_scale, get_gpdframe
-from .conversion_helpers import get_features_dict, get_final_coverage_polygon
-from .conversion_helpers import create_gdframe
-
 
 def conversion(side, geojson):
     """
@@ -106,8 +106,10 @@ def conversion(side, geojson):
 
     area_map_r, mn, mx = get_raster(gpdf_final, scale, CRS=CRS)
     points_r, types = coo_to_points(gpdf_points, mn, mx, scale=scale)
-    area_map, points =  down_sample(side, area_map_r, points_r, meter=m)
+    area_map, points = down_sample(side, area_map_r, points_r, meter=m)
 
-    retransformer = lambda cp: ((np.array(cp)*side)*mx/scale)+mn[None,None,:] + 1e-4
+    print(mn, mx, scale, area_map.shape, m, area_map_r.shape)
+    def retransformer(cp): return ((np.array(cp)*side) *
+                                   mx/scale)+mn[None, None, :] + 1e-4
 
     return area_map, points, types, retransformer
