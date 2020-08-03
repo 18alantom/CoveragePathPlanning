@@ -25,7 +25,7 @@ def run_coverage(geojson, altitude=None, fov=None, side=None,
     """
     if side == None:
         try:
-            side = altitude*np.tsan(fov/(180/np.pi))
+            side = altitude*np.tan(fov/(180/np.pi))
         except:
             raise ValueError("no way to calculate coverage area")
     area_map, points, types, retransformer = conversion(side, geojson)
