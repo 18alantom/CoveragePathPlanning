@@ -108,8 +108,8 @@ def conversion(side, geojson):
     points_r, types = coo_to_points(gpdf_points, mn, mx, scale=scale)
     area_map, points = down_sample(side, area_map_r, points_r, meter=m)
 
-    print(mn, mx, scale, area_map.shape, m, area_map_r.shape)
+    # print(mn, mx, scale, area_map.shape, m, area_map_r.shape)
     def retransformer(cp): return ((np.array(cp)*side) *
-                                   mx/scale)+mn[None, None, :] + 1e-4
+                                   mx/(scale * m))+mn[None, None, :] + 1e-4
 
     return area_map, points, types, retransformer
