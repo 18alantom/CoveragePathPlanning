@@ -1,94 +1,77 @@
-#import geopandas
+from flask import Markup
 from flask import Flask
 from flask_pymongo import pymongo
 from app import app
-from flask import render_template,session,url_for,request,redirect,make_response,jsonify
+import json
+#from .temp import temp
+#from app.run_coverage import coverage_algorithms
+from cpp_algorithms import run_coverage
+
+from flask import render_template, session, url_for, request, redirect, make_response, jsonify
+
+
 CONNECTION_STRING = "mongodb+srv://test:test@cluster0.ae3zt.mongodb.net/test?retryWrites=true&w=majority"
 client = pymongo.MongoClient(CONNECTION_STRING)
 db = client.get_database('cluster0')
 user_collection = pymongo.collection.Collection(db, 'user_collection')
-#mongo=pymongo(app)
 global req1
+global r
+global coverage_path
 
-@app.route("/",methods=['POST','GET'])
+
+@app.route("/", methods=['POST', 'GET'])
 def index():
-	
-	if 'username' in session:
-		return 'You are logged in as '+session['username']
-	
-	if 	request.method=='POST':
-		users=db.collection
-		name=request.form.get('username')
-		password=request.form.get('password')
-		ex_user=users.find_one({'username': name})
+    '''if 'username' in session:
+            return 'You are logged in as '+session['username']'''
 
-		if ex_user is None:
-			users.insert({'username':name, 'password':password})
-			session['username']=request.form.get('username')
-			return redirect(url_for('input'))
+    if request.method == 'POST':
+        users = db.collection
+        name = request.form.get('username')
+        password = request.form.get('password')
+        ex_user = users.find_one({'username': name})
 
-		else:
-			return('The username already exists!')
+        if ex_user is None:
+            users.insert({'username': name, 'password': password})
+            session['username'] = request.form.get('username')
+            return redirect(url_for('shapefile'))
 
-		
-	return render_template('index.html')
+        '''else:
+			return('The username already exists!')'''
 
-@app.route("/input",methods=['POST','GET'])
+    return render_template('index.html')
+
+
+@app.route("/input", methods=['POST', 'GET'])
 def input():
-    if request.method=='POST':
-    	
-    	return redirect(url_for('shconv_2'))
-    	
-    return render_template('input.html')
+
+    return render_template('shapefile.html',)
 
 
-
-@app.route("/input/hello",methods=['POST'])
+@app.route("/input/hello", methods=['POST'])
 def hello():
-	global roll
-	req1=request.get_json()
-	print(req1)
-	roll=req1
-	res1=make_response(jsonify(req1),200)
-	return res1
+    global r
+    req1 = request.get_json()
+    res1 = make_response(jsonify(req1), 200)
+    r = req1
 
-@app.route("/shconv_2")
-def shconv_2():
+    return res1
 
-	return render_template('shconv_2.html')
+@app.route("/shapefile")
+def shapefile():
+    return render_template('shapefile.html')
 
-@app.route("/shconv_2/create-entry",methods=['POST'])
+
+@app.route("/shapefile/create-entry", methods=['POST'])
 def create_entry():
-	req = request.get_json()
-	print(req)
-	res = make_response(jsonify(req), 200)
-	return res
+    global r
+    req = request.get_json()
 
-
-'''@app.route("/about")
-def about():
-	return 
-		<form method ="POST" action="/create">
-			 <input type="file" name="shapefile_image">
-			 <input type="submit">
-		</form>
-	'''         
-
-	        	
-
-
-
-
-@app.route('/create',methods=['POST'])
-def create():
-	if 'shapefile_image' in request.files:
-		x=db.files
-		shapefile_image=request.files['shapefile_image']
-		#x.save(shapefile_image.filename, shapefile_image)
-		x.insert({'shapefile_image_name':shapefile_image})
-	return 'Done!'    
-
-
-@app.route("/test")
-def test():
-	return roll
+    print(r)
+    print(req)
+    side = r['side']
+    print(side)
+    coverage_path = run_coverage(
+        req, side=side)
+    print(coverage_path)
+    res = make_response(jsonify(coverage_path), 200)
+    return res

@@ -12,17 +12,16 @@
     <div class="hero1">
     <div class="form-box1">
 
-    <form id="register1"   method="post"  class="input-group1">
+    <form id="register1"  methods="post"   class="input-group1">
     	<h1><b>INPUTS FOR THE PROGRAM</b></h1>
-        <input type="number"     class="input-field1" name='drones' id='drones' placeholder="Number of drones" required>
-        <input type="number"     class="input-field1" name='ranges' id='ranges' placeholder="Range (in km based on battery life)" required>
-        <input type="number"     class="input-field1" name='speed' id='speed' placeholder="Top speed"required>
-        <input type="number"     class="input-field1" name='altitude' id='altitude' placeholder="Altitude(Height)"required>
-        <input type="number"     class="input-field1" name='angle' id='angle' placeholder="Field Of Vision(Angle)"required>
+        <input type="number"     id="drones" class="input-field1" placeholder="Number of drones" required>
+        <input type="number"     id="ranges" class="input-field1" placeholder="Range (in km based on battery life)" required>
+        <input type="number"     id="speed" class="input-field1" placeholder="Top speed"required>
+        <input type="number"     id="altitude" class="input-field1" placeholder="Altitude" required>
+        <input type="number"     id="angle" class="input-field1" placeholder="Field Of Vision(Angle)" required>
+        <input type="text"     id="obstacles" class="input-field1" placeholder="Obstacles" required>
 
-
-        
-        <button type="submit" href="/shconv_2" onclick="submit_entry();" class="submit-btn1"><b>Proceed</b></button>
+        <button type="submit"  href="/shconv_2" onclick="submit_entry();" class="submit-btn1"><b>Proceed</b></button>
     </form>
 
     </div>
@@ -36,6 +35,7 @@
             var speed=document.getElementById("speed");
             var altitude=document.getElementById("altitude");
             var angle=document.getElementById("angle");
+            var obstacles=document.getElementById("obstacles");
 
 
 
@@ -44,9 +44,11 @@
                 ranges:ranges.value,
                 speed:speed.value,
                 altitude:altitude.value,
-                angle:angle.value
+                angle:angle.value,
+                obstacles:obstacles.value
             };
-            console.log('hi')
+
+            sessionStorage.setItem("entry1",JSON.stringify(entry1));
             fetch(`${window.origin}/input/hello`, {
                method: "POST",
                credentials: "include",

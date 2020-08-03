@@ -9,5 +9,12 @@ app.secret_key = os.urandom(24)
 
 
 from app import views
+
+
 from app import admin_views
+
+
+
+#raise Exception("hi")
+
 #from app import db
