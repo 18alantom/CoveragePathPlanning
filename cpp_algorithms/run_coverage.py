@@ -36,6 +36,7 @@ def run_coverage(geojson, altitude=None, fov=None, side=None,
     if full_paths is None:
         full_paths = list(map(np.array, coverage_paths))
     lnglat_path = list(map(retransformer, full_paths))
+    lnglat_path = list(map(lambda l:l.reshape(-1,2), lnglat_path))
 
     def cm(cp): return coverage_metrics(area_map, cp)
 
