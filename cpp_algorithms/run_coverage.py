@@ -41,14 +41,38 @@ def run_coverage(geojson, altitude=None, fov=None, side=None,
     except:
         print("no fuel points found")
 
-
     coverage_paths, full_paths, detour_idxes = cpp(
         area_map, start_points, fuel_points, fuel_capacity, online, epochs, use_flood, drone_speed, drone_coverage, pbar=pbar)
     if full_paths is None:
         full_paths = list(map(np.array, coverage_paths))
     lnglat_path = list(map(retransformer, full_paths))
-    lnglat_path = list(map(lambda l:l.reshape(-1,2), lnglat_path))
+    lnglat_path = list(map(lambda l: l.reshape(-1, 2), lnglat_path))
 
     def cm(cp): return coverage_metrics(area_map, cp)
+    temp_paths = []
+    for x in lnglat_path:
+        temp_paths.append(
+            list(map(lambda x: {'lat': x[1].item(), 'lng': x[0].item()}, x)))
 
-    return {"fullPath": full_paths, "lnglatPath": lnglat_path, "detourIndices": detour_idxes, "coverageMetrics": list(map(cm, coverage_paths))}
+    lnglat_path = temp_paths
+
+    temp_paths = []
+    for x in full_paths:
+        temp_paths.append(
+            list(map(lambda x: (x[0].item(), x[1].item()), x.reshape(-1, 2))))
+    full_paths = temp_paths
+
+    list(map(cm, coverage_paths))
+
+    cov_metrics = []
+    for cp in coverage_paths:
+        temp = {}
+        cm = coverage_metrics(area_map, cp)
+        for k in cm:
+            try:
+                temp[k] = cm[k].item()
+            except:
+                temp[k] = cm[k]
+        cov_metrics.append(temp)
+
+    return {"fullPath": full_paths, "lnglatPath": lnglat_path, "detourIndices": detour_idxes, "coverageMetrics": cov_metrics}
