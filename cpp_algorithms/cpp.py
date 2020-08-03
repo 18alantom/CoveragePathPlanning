@@ -2,9 +2,11 @@ from cpp_algorithms.darp import darp
 from cpp_algorithms.coverage_path.bcd import bcd
 from cpp_algorithms.coverage_path.stc import stc
 from cpp_algorithms.common_helpers import get_drone_map
+from cpp_algorithms.fuel_path.fuel_path import get_fuel_paths
+from cpp_algorithms.fuel_path.fuel_path_helpers import splice_paths
 
 
-def cpp(area_map, start_points, online=False, epochs=300, use_flood=True,
+def cpp(area_map, start_points, fuel_points=None, fuel_capacity=None, online=False, epochs=300, use_flood=True,
         drone_speed=None, drone_coverage=None, pbar=False):
     """
     The main coverage path caller will return coverage_paths for
@@ -35,4 +37,17 @@ def cpp(area_map, start_points, online=False, epochs=300, use_flood=True,
     else:
         coverage_paths = [stc(drone_maps[i], start_points[i])
                           for i in range(n)]
-    return coverage_paths
+    if fuel_points is not None and fuel_capacity is not None:
+        full_paths = []
+        detour_idxes = []
+        for coverage_path in coverage_paths:
+            # Get fuel path
+            _, detour_idx, fuel_paths, _ = get_fuel_paths(
+                coverage_path, area_map, fuel_points, fuel_capacity)
+            # Splice fuel path
+            full_path, detour_idx = splice_paths(
+                coverage_path, fuel_paths, detour_idx)
+            full_paths.append(full_path)
+            detour_idxes.append(detour_idx)
+        return coverage_paths, full_paths, detour_idxes
+    return coverage_paths, None, None

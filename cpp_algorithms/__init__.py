@@ -24,4 +24,5 @@ from .testers import single_robot_single
 from .testers import single_robot_multiple
 
 # Rasterization functions
-from .rasterize import conversion, cp_to_latlng
+from .conversion import conversion
+from .run_coverage import run_coverage
