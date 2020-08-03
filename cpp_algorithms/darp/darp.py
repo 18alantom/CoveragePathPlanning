@@ -28,7 +28,7 @@ def darp(epochs, area_map, start_points, drone_speed=None, drone_coverage=None, 
     c = get_c(area_map)
     E = get_evaluation_matrices(start_points, area_map)
 
-    use_flood = None
+    flood_matrix = None
     # Flood matrix
     if use_flood:
         flood_matrix = get_flood_matrix(area_map, pbar=pbar)
