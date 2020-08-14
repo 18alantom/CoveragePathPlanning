@@ -80,6 +80,14 @@ def imshow(area_map,r=1,c=1,i=1,figsize=(5,5),cmap="viridis"):
     plt.axis('off');
     return ax
 
+def plot(cp, alpha=0.8, color="lightblue"):
+    """
+    Plot coverage path as a line.
+    """ 
+    cp = np.array(cp)
+    x,y = cp.T
+    plt.plot(y,x,alpha=alpha,color=color)
+
 def get_random_coords(area_map,n=2,obs=-1):
     """
     Return random coords from the map
