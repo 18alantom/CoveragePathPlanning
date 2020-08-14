@@ -1,2 +1,7 @@
-# nm_383_cpp
-Code pertaining to the coverage path planning problem for SIH 2020 problem statement NM 383
+# CoveragePathPlanning
+Code pertaining to the coverage path planning.  
+Contains Implementations for
+- Spanning Tree Coverage
+- Boustrophedon
+- Wavefront Based Path Planning
+- DARP: Divide Areas Algorithm for Optimal Multi-Robot Coverage Path Planning
