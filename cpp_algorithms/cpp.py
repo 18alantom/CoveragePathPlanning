@@ -1,6 +1,7 @@
 from cpp_algorithms.darp import darp
 from cpp_algorithms.coverage_path.bcd import bcd
 from cpp_algorithms.coverage_path.stc import stc
+from cpp_algorithms.coverage_path.wavefront import wavefront
 from cpp_algorithms.common_helpers import get_drone_map
 from cpp_algorithms.fuel_path.fuel_path import get_fuel_paths
 from cpp_algorithms.fuel_path.fuel_path_helpers import splice_paths
@@ -31,7 +32,10 @@ def cpp(area_map, start_points, fuel_points=None, fuel_capacity=None, online=Fal
     else:
         drone_maps = [area_map]
 
-    if online:
+    if online == "wavefront":
+        coverage_paths = [wavefront(drone_maps[i], start_points[i])
+                          for i in range(n)]
+    elif online:
         coverage_paths = [bcd(drone_maps[i], start_points[i])
                           for i in range(n)]
     else:
