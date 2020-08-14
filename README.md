@@ -46,6 +46,7 @@ Uses the shortest L1 path to get to the fuel point from a point in the coverage 
 
 ### Tests
 Tests on the CPP and Fuelling algos with metrics are [here](./test_notebooks/CPPTests.ipynb).
+Tests on STC running on the test area maps.
 ![STCTests](./demo_media/stctests.png)
 
 ### Running on Shapefiles
