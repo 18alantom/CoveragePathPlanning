@@ -41,7 +41,7 @@ Uses the shortest L1 path to get to the fuel point from a point in the coverage 
 - Pink path is the coverage path, light blue is the fuelling path.
 - Yellow is the start point and red is the end point.
 - The algorithm displayed is STC.
-- [Animation source notebook](./test_maps/CPPTests.ipynb), [algo notebook](./ShortestL1Fuelling.ipynb).
+- [Animation source notebook](./test_notebooks/CPPTests.ipynb), [algo notebook](./ShortestL1Fuelling.ipynb).
 ![Fuelling while STC](./demo_media/stcfuel.gif)
 
 ### Tests
