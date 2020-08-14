@@ -6,8 +6,8 @@ DARP : Divide Areas Algorithm for Optimal Multi-Robot Coverage Path, is an equal
 
 - DARP visualization on a test area map.
 - Left most images are area maps that have roughly the same number of assigned cells. 
-- Point gradients are traversable $L_1$ distance based.
-- Region gradients pertain to the computation of the $C_i$ matrix as given in the paper.
+- Point gradients are traversable L1 distance based.
+- Region gradients pertain to the computation of the Ci matrix as given in the paper.
 
 ![DARP](./demo_media/darp.png)
 [Image source notebook](./test_notebooks/DARPTests.ipynb). [Preprint](http://kapoutsis.info/wp-content/uploads/2017/02/j3.pdf) and [Repository](https://github.com/athakapo/DARP).
