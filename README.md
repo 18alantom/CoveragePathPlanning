@@ -63,7 +63,6 @@ More [here](./DARPShapefiles.ipynb) (execrable reprojections, pls hlp).
 
 **Should Do**
 - Fix issue with DARP.
-- Fix reprojections.
 - Add latest optimizaiton of STC.
 
 
